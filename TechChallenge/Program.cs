@@ -15,7 +15,7 @@ class Program
         var r = new Random();
         var stopwatch = new Stopwatch();
 
-        Key = GenerateRandomKey(r, vowelsList.ToArray());        
+        Key = GenerateRandomKey(r, vowelsList.ToArray());
         stopwatch.Start();
 
         while (true)
@@ -67,21 +67,31 @@ class Program
         if (tested.Contains(key))
             return await Task.FromResult(false);
 
-        if (Key == key)
+        var client = new HttpClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://fiap-inaugural.azurewebsites.net/fiap");
+        var content = new StringContent("{\r\n    \"key\": \"" + key + "\"\r\n}", null, "application/json");
+        request.Content = content;
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        Console.WriteLine(await response.Content.ReadAsStringAsync());
+
+        tested.Add(key);
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             Console.WriteLine("Chave: " + key);
             Console.WriteLine("Tentativas: " + tested.Count);
             Console.WriteLine("Tempo: " + (stopwatch.ElapsedMilliseconds / 1000) + " seg");
             return await Task.FromResult(true);
         }
-
-        tested.Add(key);
-        return await Task.FromResult(false);
+        else
+        {
+            return await Task.FromResult(false);
+        }
     }
 
     public static string GenerateRandomKey(Random r, string[] vowels)
-    {                
-        var randomNum = r.Next(min, max);        
+    {
+        var randomNum = r.Next(min, max);
 
         var selectedVowelB = vowels[r.Next(vowels.Length)];
         var selectedVowelA = vowels[r.Next(vowels.Length)];

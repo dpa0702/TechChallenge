@@ -1,12 +1,16 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
+using System.Text;
 
 class Program
 {
     public static string Key = string.Empty;
+
+    public const int min = 1;
+    public const int max = 10000;
     static void Main(string[] args)
     {
         List<string> tested = new List<string>();
-        var vowels = "A,E,I,O,U,Á,É,Í,Ó,Ú,À,È,Ì,Ò,Ù,Â,Ê,Î,Ô,Û,Ã,Õ,Ä,Ë,Ï,Ö,Ü";
+        var vowels = " ,A,E,I,O,U,Á,É,Í,Ó,Ú,À,È,Ì,Ò,Ù,Â,Ê,Î,Ô,Û,Ã,Õ,Ä,Ë,Ï,Ö,Ü,B,C,D,F,G,H,J,K,L,M,N,P,Q,R,S,T,V,W,X,Y,Z";
         var vowelsList = vowels.Split(",");
         var r = new Random();
         var stopwatch = new Stopwatch();
@@ -18,7 +22,7 @@ class Program
         {
             vowelsList.AsParallel().ForAll(async vog =>
             {
-                var randomNum = r.Next(1, 1001);
+                var randomNum = r.Next(min, max);
                 var key = $"{(vog + "").ToLower()}{randomNum}";
 
                 Console.WriteLine(key);
@@ -28,7 +32,7 @@ class Program
 
             vowelsList.AsParallel().ForAll(async vog =>
             {
-                var randomNum = r.Next(1, 1001);
+                var randomNum = r.Next(min, max);
                 var key = $"{randomNum}{(vog + "").ToLower()}";
 
                 Console.WriteLine(key);
@@ -38,7 +42,7 @@ class Program
 
             vowelsList.AsParallel().ForAll(async vog =>
             {
-                var randomNum = r.Next(1, 1001);
+                var randomNum = r.Next(min, max);
                 var key = $"{(vog + "").ToUpper()}{randomNum}";
 
                 Console.WriteLine(key);
@@ -48,7 +52,7 @@ class Program
 
             vowelsList.AsParallel().ForAll(async vog =>
             {
-                var randomNum = r.Next(1, 1001);
+                var randomNum = r.Next(min, max);
                 var key = $"{randomNum}{(vog + "").ToUpper()}";
 
                 Console.WriteLine(key);
@@ -65,9 +69,9 @@ class Program
 
         if (Key == key)
         {
-            Console.WriteLine("Chave " + key);
-            Console.WriteLine("Tentativas " + tested.Count);
-            Console.WriteLine("Tempo " + (stopwatch.ElapsedMilliseconds / 1000) + " seg");
+            Console.WriteLine("Chave: " + key);
+            Console.WriteLine("Tentativas: " + tested.Count);
+            Console.WriteLine("Tempo: " + (stopwatch.ElapsedMilliseconds / 1000) + " seg");
             return await Task.FromResult(true);
         }
 
@@ -77,18 +81,18 @@ class Program
 
     public static string GenerateRandomKey(Random r, string[] vowels)
     {                
-        var randomNum = r.Next(1, 1001);        
+        var randomNum = r.Next(min, max);        
 
-        var selectedVowel = vowels[r.Next(vowels.Length)];
-        bool addAtBeginning = r.Next(2) == 0;
-        bool upperCase = r.Next(2) == 0;
+        var selectedVowelB = vowels[r.Next(vowels.Length)];
+        var selectedVowelA = vowels[r.Next(vowels.Length)];
+        bool upperCaseB = r.Next(2) == 0;
+        bool upperCaseA = r.Next(2) == 0;
 
-        var randomKey = addAtBeginning ? 
-               selectedVowel + randomNum.ToString() :
-               randomNum.ToString() + selectedVowel;        
+        StringBuilder sb = new StringBuilder();
+        sb.Append(upperCaseB ? selectedVowelB.ToUpper() : selectedVowelB.ToLower());
+        sb.Append(randomNum.ToString());
+        sb.Append(upperCaseA ? selectedVowelA.ToUpper() : selectedVowelA.ToLower());
 
-        return upperCase ?
-               randomKey.ToUpper() :
-               randomKey.ToLower();
+        return sb.ToString().Trim();
     }
 }
